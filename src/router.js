@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
+// import Home from './views/Home.vue'
+// import StudentManage from './views/studentManage'
 
 Vue.use(Router)
 
@@ -10,16 +11,38 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home
+      name: 'index',
+      redirect: '/home'
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      path: '/home',
+      name: 'home',
+      component: () => import('./views/Home.vue'),
+      children: [{
+        path: 'studentManage',
+        name: 'studentManage',
+        component: () => import('./views/studentManage')
+      },
+      {
+        path: 'approveManage',
+        name: 'approveManage',
+        component: () => import('./views/approveManage')
+      },
+      {
+        path: 'couponManage',
+        name: 'couponManage',
+        component: () => import('./views/couponManage')
+      },
+      {
+        path: 'businessManage',
+        name: 'businessManage',
+        component: () => import('./views/businessManage')
+      },
+      {
+        path: 'messageNotice',
+        name: 'messageNotice',
+        component: () => import('./views/messageNotice')
+      }]
     }
   ]
 })

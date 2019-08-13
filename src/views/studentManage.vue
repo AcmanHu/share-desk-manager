@@ -1,12 +1,13 @@
 <template>
-  <div class="hello">
-    123
+<!-- 学生管理  -->
+  <div class="content">
+    学生管理
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'StudentManage',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
