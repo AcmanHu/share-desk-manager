@@ -1,14 +1,16 @@
 <template>
   <div class="content">
-    <span class="title">后台管理系统</span>
-    <div class="avater">
-      <el-dropdown>
-        <el-avatar :size="50" :src="circleUrl"></el-avatar>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>重新登录</el-dropdown-item>
-          <el-dropdown-item>退出</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+    <div class="wrap">
+      <span class="title">共享书桌后台管理系统</span>
+      <div class="avater">
+        <el-dropdown>
+          <el-avatar :size="50" :src="circleUrl"></el-avatar>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>重新登录</el-dropdown-item>
+            <el-dropdown-item>退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
     </div>
   </div>
 </template>
@@ -32,21 +34,27 @@ export default {
 .content {
   height: 100%;
   // background: #ccc;
-  box-shadow: 2px 2px 6px #ccc;
+  // box-shadow: 2px 2px 6px #ccc;
   font-weight: bold;
   display: flex;
-  align-items: center;
   justify-content: center;
-  position: relative;
-  .title {
-    font-size: 18px;
-  }
-  .avater {
-    position: absolute;
-    height: 100%;
-    right: 10px;
+  justify-content: center;
+  .wrap {
     display: flex;
     align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    .title {
+      font-size: 20px;
+    }
+    .avater {
+      position: absolute;
+      height: 100%;
+      left: 10px;
+      display: flex;
+      align-items: center;
+    }
   }
 }
 </style>

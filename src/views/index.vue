@@ -1,28 +1,25 @@
 <template>
   <div class="home pb_height">
     <el-container class="ele_container pb_height">
-      <el-aside width="200px" class="ele_aside pb_height">
-        <div class="logo_box">
-          <!-- <img src="../assets/logo.jpg" alt /> -->
-        </div>
-        <el-menu
-          :default-active="navActive"
-          class="el-menu-vertical-demo"
-          @open="handleOpen"
-          @close="handleClose"
-        >
-          <router-link :to="{name:item.path}" tag="li" v-for="(item, key) in navList" :key="key">
-            <el-menu-item :index="key+''">
-              <i :class="item.icon"></i>
-              <span slot="title">{{item.name}}</span>
-            </el-menu-item>
-          </router-link>
-        </el-menu>
-      </el-aside>
-      <el-container>
-        <el-header style="box-shadow: 2px 2px 6px #ccc;">
-          <myHead></myHead>
-        </el-header>
+      <el-header style="box-shadow: 2px 2px 6px #ccc;">
+        <myHead></myHead>
+      </el-header>
+      <el-container class="m-container">
+        <el-aside width="200px" class="ele_aside pb_height">
+          <el-menu
+            :default-active="navActive"
+            class="el-menu-vertical-demo"
+            @open="handleOpen"
+            @close="handleClose"
+          >
+            <router-link :to="{name:item.path}" tag="li" v-for="(item, key) in navList" :key="key">
+              <el-menu-item :index="key+''">
+                <i :class="item.icon"></i>
+                <span slot="title">{{item.name}}</span>
+              </el-menu-item>
+            </router-link>
+          </el-menu>
+        </el-aside>
         <el-main class="ele_main">
           <div class="m_main">
             <bread-crumb @getRoute="getRoute"></bread-crumb>
@@ -100,20 +97,16 @@ export default {
 .pb_height {
   height: 100%;
 }
+// .m-container{
+//     width: 1150px;
+//     margin:  0 auto;
+// }
 .home {
-  .logo_box {
-    height: 130px;
-    width: 100%;
-    background: #ccc;
-    img {
-      height: 100%;
-      width: 100%;
-    }
-  }
   .ele_container {
     .ele_aside {
+      padding: 20px 0;
       ul {
-        height: calc(100% - 130px);
+        height: 100%;
       }
     }
   }

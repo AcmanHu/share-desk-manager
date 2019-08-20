@@ -17,7 +17,7 @@ export default new Router({
     {
       path: '/home',
       name: 'home',
-      component: () => import('./views/Home.vue'),
+      component: () => import('./views/home.vue'),
       children: [{
         path: 'studentManage',
         name: 'studentManage',
@@ -42,7 +42,8 @@ export default new Router({
         path: 'messageNotice',
         name: 'messageNotice',
         component: () => import('./views/messageNotice')
-      }]
+      }],
+      redirect: '/home/studentManage'
     }
   ]
 })
