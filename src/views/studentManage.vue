@@ -50,64 +50,64 @@
 
 <script>
 export default {
-  name: "StudentManage",
-  data() {
+  name: 'StudentManage',
+  data () {
     return {
       // 表格数据
       tableData: [
         {
-          id: "001",
-          name: "刘小虎",
-          bedroomNum: "8532",
-          date: "2016-05-02",
-          deskBack: "是",
+          id: '001',
+          name: '刘小虎',
+          bedroomNum: '8532',
+          date: '2016-05-02',
+          deskBack: '是',
           ticketNum: 10,
-          address: "上海市普陀区金沙江路 1518 弄"
+          address: '上海市普陀区金沙江路 1518 弄'
         },
         {
-          id: "002",
-          name: "刘小虎",
-          bedroomNum: "8532",
-          date: "2016-05-20",
-          deskBack: "否",
+          id: '002',
+          name: '刘小虎',
+          bedroomNum: '8532',
+          date: '2016-05-20',
+          deskBack: '否',
           ticketNum: 10,
-          address: "上海市普陀区金沙江路 1518 弄"
+          address: '上海市普陀区金沙江路 1518 弄'
         }
       ],
       // 表格搜索数据
-      search: "",
+      search: '',
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
       pagesize: 10
-    };
+    }
   },
   computed: {
-    tableList() {
+    tableList () {
       return this.tableData.slice(
         (this.currentPage - 1) * this.pagesize,
         this.currentPage * this.pagesize
-      );
+      )
     }
   },
   methods: {
-    handleEdit(index, row) {
-      console.log(index, row);
+    handleEdit (index, row) {
+      console.log(index, row)
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    handleDelete (index, row) {
+      console.log(index, row)
     },
     //  分页每页条目改变时会触发
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
     },
     // 当前页改变时会触发
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      console.log(`当前页: ${val}`);
+    handleCurrentChange (val) {
+      this.currentPage = val
+      console.log(`当前页: ${val}`)
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

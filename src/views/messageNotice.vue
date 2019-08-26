@@ -1,24 +1,24 @@
 <template>
 <!-- 消息通知 -->
   <div class="content">
-    <span>消息通知</span>
+    <span>开发中...</span>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
+  data () {
     return {
-    };
+    }
   },
   computed: {
   },
-  created() {},
- 
+  created () {},
+
   methods: {
-   
+
   }
-};
+}
 </script>
 
 <style scoped lang="scss">

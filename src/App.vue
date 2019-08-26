@@ -6,28 +6,26 @@
 
 <script>
 export default {
-  name: "App",
-  data() {
+  name: 'App',
+  data () {
     return {
       fullHeight: document.documentElement.clientHeight
-    };
+    }
   },
-  mounted() {
-    this.getWindow();
+  mounted () {
+    this.getWindow()
   },
   methods: {
-    getWindow() {
+    getWindow () {
       window.onresize = () => {
-        console.log("宽度发生变化了");
         return (() => {
-          window.fullHeight = document.documentElement.clientHeight;
-          this.fullHeight = window.fullHeight;
-          console.log(fullHeight);
-        })();
-      };
+          window.fullHeight = document.documentElement.clientHeight
+          this.fullHeight = window.fullHeight
+        })()
+      }
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
@@ -41,6 +39,26 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+ul li {
+  list-style: none;
+}
+/* 常规通用样式 */
+
+.d_flex {
+  display: flex;
+  align-items: center;
+}
+.d_flex_spbet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+//
 .m-content {
   height: 100%;
   .m-wrap {

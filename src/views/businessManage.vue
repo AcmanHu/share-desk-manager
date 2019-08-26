@@ -75,69 +75,69 @@
 
 <script>
 export default {
-  name: "StudentManage",
-  data() {
+  name: 'StudentManage',
+  data () {
     return {
       // 表格数据
       tableData: [
         {
-          id: "001",
-          shopName: "商家名称",
-          address: "九龙坡",
-          contact: "联系人",
-          phone: "联系电话",
-          createDate: "2019-08-20",
-          username: "用户名",
-          password: "888888"
+          id: '001',
+          shopName: '商家名称',
+          address: '九龙坡',
+          contact: '联系人',
+          phone: '联系电话',
+          createDate: '2019-08-20',
+          username: '用户名',
+          password: '888888'
         }
       ],
       // 表格搜索数据
-      search: "",
+      search: '',
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
       pagesize: 10,
       // 弹出层显示与隐藏
       dialogFormVisible: false,
-      formLabelWidth: "120px",
+      formLabelWidth: '120px',
       // 弹出层form表单的数据
       form: {
-        shopName: "",
-        address: "",
-        contact: "",
-        date: "",
-        phone: "",
-        username: "",
-        password: ""
+        shopName: '',
+        address: '',
+        contact: '',
+        date: '',
+        phone: '',
+        username: '',
+        password: ''
       }
-    };
+    }
   },
   computed: {
-    tableList() {
+    tableList () {
       return this.tableData.slice(
         (this.currentPage - 1) * this.pagesize,
         this.currentPage * this.pagesize
-      );
+      )
     }
   },
   methods: {
-    handleEdit(index, row) {
-      console.log(index, row);
+    handleEdit (index, row) {
+      console.log(index, row)
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    handleDelete (index, row) {
+      console.log(index, row)
     },
     //  分页每页条目改变时会触发
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
     },
     // 当前页改变时会触发
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      console.log(`当前页: ${val}`);
+    handleCurrentChange (val) {
+      this.currentPage = val
+      console.log(`当前页: ${val}`)
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
