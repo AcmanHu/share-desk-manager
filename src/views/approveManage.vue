@@ -88,7 +88,7 @@
           </div>
         </div>
         <div class="demo-drawer__footer">
-          <el-button @click="isPass" type="primary" plain>同意</el-button>
+          <el-button @click="isPass('agree')" type="primary" plain>同意</el-button>
           <el-button type="danger" plain @click="onDisagree">不同意</el-button>
           <!-- <el-input placeholder="请输入内容"></el-input> -->
         </div>
@@ -114,7 +114,7 @@ export default {
           status: "未审批"
         }
       ],
-      // 一个数据
+      // 一条详情数据
       oneDetailData: {},
       tableFilterData: [
         { text: "未审批", value: "未审批" },
@@ -129,9 +129,8 @@ export default {
       pagesize: 30,
       // 分页总数
       pageTotal: 10,
-      //
+      //弹出层
       dialog: false,
-      loading: false,
       form: {
         name: "",
         region: "",
@@ -141,8 +140,7 @@ export default {
         type: [],
         resource: "",
         desc: ""
-      },
-      formLabelWidth: "80px"
+      }
     };
   },
   computed: {
@@ -151,10 +149,11 @@ export default {
     }
   },
   mounted() {
-    this.getApproveInfo(1);
+    this.getApproveInfo();
   },
   methods: {
-    getApproveInfo(num) {
+    // 获取审核数据
+    getApproveInfo(num = 1) {
       this.$http
         .get("/audit/getAll", {
           params: {
@@ -199,14 +198,11 @@ export default {
     },
     // 表格详情
     handleDetail(index, row) {
-      console.log(index, row);
       this.oneDetailData = row;
       this.dialog = true;
     },
     // 表格中状态的筛选
     filterTag(value, row) {
-      console.log(value, row);
-
       return row.status === value;
     },
     //  分页每页条目改变时会触发
@@ -217,17 +213,10 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val;
       this.getApproveInfo(val);
-      console.log(`当前页: ${val}`);
     },
-    //
+    // 关闭弹出层
     handleClose(done) {
       this.dialog = false;
-      // this.$confirm("确定要提交表单吗？")
-      //   .then(_ => {
-      //     // this.loading = true;
-      //     this.loading = false;
-      //   })
-      //   .catch(_ => {});
     },
     // 不同意审核
     onDisagree() {
@@ -261,30 +250,29 @@ export default {
         oData = data;
       }
       console.log(oData);
-
-      // this.$http
-      //   .put("/audit/submit", oData, {
-      //     headers: {
-      //       Authorization: "Bearer " + localStorage.getItem("token")
-      //     }
-      //   })
-      //   .then(res => {
-      //     console.log(res);
-      //     // if (res.data.code === 0) {
-      //     //   localStorage.setItem("token", res.data.data);
-      //     //   this.$message({
-      //     //     message: "登陆成功",
-      //     //     type: "success"
-      //     //   });
-      //     //   this.$router.replace({ name: "home" });
-      //     // } else {
-      //     //   this.$message.error(res.data.msg);
-      //     // }
-      //   })
-      //   .catch(err => {
-      //     this.$message.error("网络错误，请稍后再试哦");
-      //     console.log(err);
-      //   });
+      this.$http
+        .put("/audit", oData, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "审核成功",
+              type: "success"
+            });
+            this.dialog = false;
+            this.getApproveInfo();
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(err => {
+          this.$message.error("网络错误，请稍后再试哦");
+          console.log(err);
+        });
     }
   }
 };

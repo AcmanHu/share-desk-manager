@@ -13,10 +13,10 @@
           height="100%"
         >
           <el-table-column label="ID" prop="id" align="center" sortable></el-table-column>
-          <el-table-column label="姓名" prop="name" align="center"></el-table-column>
+          <el-table-column label="姓名" prop="userName" align="center"></el-table-column>
           <el-table-column label="电话" prop="phone" align="center" sortable></el-table-column>
-          <el-table-column label="寝室号" prop="bedroomNum" align="center"></el-table-column>
-          <el-table-column label="合同日期" prop="date" align="center" sortable></el-table-column>
+          <el-table-column label="寝室号" prop="houseId" align="center"></el-table-column>
+          <el-table-column label="合同日期" prop="pactTime" align="center" sortable></el-table-column>
           <!-- <el-table-column label="是否申请退桌" prop="deskBack" align="center">
             <template slot-scope="scope">
               <el-tag
@@ -82,26 +82,16 @@ export default {
     return {
       // 表格数据
       tableData: [
-        {
-          id: "001",
-          name: "刘小虎",
-          bedroomNum: "8532",
-          date: "2016-05-02",
-          deskBack: "是",
-          phone: "123",
-          ticketNum: 10,
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          id: "002",
-          name: "刘小虎",
-          bedroomNum: "8532",
-          date: "2016-05-20",
-          deskBack: "否",
-          phone: "123",
-          ticketNum: 10,
-          address: "上海市普陀区金沙江路 1518 弄"
-        }
+        // {
+        //   id: "001",
+        //   name: "刘小虎",
+        //   bedroomNum: "8532",
+        //   date: "2016-05-02",
+        //   deskBack: "是",
+        //   phone: "123",
+        //   ticketNum: 10,
+        //   address: "上海市普陀区金沙江路 1518 弄"
+        // }
       ],
       // 表格搜索数据
       search: "",
@@ -129,11 +119,11 @@ export default {
     }
   },
   mounted() {
-    this.onGetUserInfo(1);
+    this.onGetUserInfo();
   },
   methods: {
     // 获取学生信息
-    onGetUserInfo(num) {
+    onGetUserInfo(num = 1) {
       this.$http
         .get("/user", {
           params: {
@@ -150,15 +140,10 @@ export default {
               this.pageTotal = res.data.data.total;
               let arr = [];
               for (const item of res.data.data.list) {
-                arr.push({
-                  id: item.id,
-                  name: item.userName,
-                  phone: item.phone,
-                  bedroomNum: item.houseId,
-                  date: item.pactTime.split("T")[0] || "",
-                  deskBack: "是",
-                  ticketNum: 10
-                });
+                item.pactTime = item.pactTime
+                  ? item.pactTime.split("T")[0]
+                  : "";
+                arr.push(item);
               }
               this.tableData = arr;
             }
@@ -171,32 +156,43 @@ export default {
           this.$message.error("网络错误，请稍后再试哦");
         });
     },
-    onEditUser(data) {
-      console.log(data);
-      // this.$http
-      //   .put(`/user`, data, {
-      //     headers: {
-      //       Authorization: "Bearer " + localStorage.getItem("token")
-      //     }
-      //   })
-      //   .then(res => {
-      //     console.log(res);
-      //   })
-      //   .catch(error => {
-      //     console.log(error);
-      //     this.$message.error("网络错误，请稍后再试哦");
-      //   });
-      this.dialogFormVisible = false;
-    },
+    // 编辑
     handleEdit(index, row) {
       console.log(index, row);
-      this.form.id = row.id;
-      this.form.userName = row.name;
-      this.form.houseId = row.bedroomNum;
-      this.form.phone = row.phone;
-      this.form.pactTime = row.date;
+      this.form = Object.assign({}, row);
       this.dialogFormVisible = true;
     },
+    onEditUser(data) {
+      let oData = Object.assign({}, data);
+      delete oData.landingTime;
+      console.log(data);
+      console.log(oData);
+      this.$http
+        .put(`/user`, oData, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "修改成功",
+              type: "success"
+            });
+            this.onGetUserInfo();
+            this.editForm = false;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+      this.dialogFormVisible = false;
+    },
+    // 删除
     handleDelete(index, row) {
       console.log(index, row);
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
@@ -228,6 +224,15 @@ export default {
         })
         .then(res => {
           console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            });
+            this.onGetUserInfo();
+          } else {
+            this.$message.error(res.data.msg);
+          }
         })
         .catch(error => {
           console.log(error);

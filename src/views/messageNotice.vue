@@ -177,7 +177,7 @@ export default {
       }
     },
     // 获取学生信息
-    onGetUserInfo(num) {
+    onGetUserInfo(num = 1) {
       this.$http
         .get("/user", {
           params: {
@@ -204,10 +204,7 @@ export default {
                   ticketNum: 10
                 });
               }
-              console.log("XXXXXXX");
-
               this.tableData = arr;
-              console.log(this.tableData);
             }
           } else {
             this.$message.error("网络错误，请稍后再试哦");
@@ -220,12 +217,12 @@ export default {
     },
     // 发送短信
     sendMessageBtn: function() {
-      if(this.numberPhone.length === 0){
+      if (this.numberPhone.length === 0) {
         this.$message({
-            type: "info",
-            message: "请选择接收对象"
-          });
-          return;
+          type: "info",
+          message: "请选择接收对象"
+        });
+        return;
       }
       this.$prompt("请输入消息类容", "提示", {
         confirmButtonText: "确定",
@@ -257,11 +254,11 @@ export default {
         )
         .then(res => {
           console.log(res);
-          this.$message({
-            type: "info",
-            message: "发送成功"
-          });
-          if (res) {
+          if (res.data.code === 0) {
+            this.$message({
+              type: "info",
+              message: "发送成功"
+            });
           } else {
             this.$message.error("网络错误，请稍后再试哦");
           }

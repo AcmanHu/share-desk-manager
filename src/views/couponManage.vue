@@ -4,7 +4,7 @@
     <div class="m-wrap">
       <div class="search_box">
         <el-input v-model="search" size="small" placeholder="输入姓名或寝室号" class="search_input" />
-        <!-- <el-button type="primary" size="small" plain @click="dialogFormVisible = true">添加</el-button> -->
+        <!-- <el-button type="primary" size="small" plain @click="addCouponForm = true">添加</el-button> -->
       </div>
       <div class="table_box">
         <el-table
@@ -57,7 +57,7 @@
       ></el-pagination>
     </div>
     <!-- 弹出层位置 -->
-    <el-dialog title="新增商家" :visible.sync="dialogFormVisible" center width="500px">
+    <el-dialog title="新增优惠券" :visible.sync="addCouponForm" center width="500px">
       <el-form :model="form">
         <el-form-item label="优惠券名称" :label-width="formLabelWidth">
           <el-input v-model="form.couponName"></el-input>
@@ -87,8 +87,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="addCouponForm = false">取 消</el-button>
+        <el-button type="primary" @click="addCouponForm = false">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 编辑优惠券 -->
@@ -106,7 +106,6 @@
         <el-form-item label="满减条件" :label-width="formLabelWidth">
           <el-input v-model="formCoupon.condition" autocomplete="off"></el-input>
         </el-form-item>
-
         <el-form-item label="开始日期" :label-width="formLabelWidth">
           <el-date-picker
             v-model="formCoupon.startTime"
@@ -168,7 +167,7 @@ export default {
       pageTotal: 10,
       // -----------------弹出层-----------------
       // 弹出层显示与隐藏
-      dialogFormVisible: false,
+      addCouponForm: false,
       editForm: false,
       formLabelWidth: "120px",
       // 弹出层form表单的数据
@@ -207,9 +206,12 @@ export default {
   },
   methods: {
     // 获取所有优惠券
-    getCouponInfo() {
+    getCouponInfo(num = 1) {
       this.$http
         .get("/coupon", {
+          params: {
+            pageNum: num
+          },
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -240,15 +242,15 @@ export default {
     },
     // 修改
     handleEdit(index, row) {
-      console.log(index, row);
       this.formCoupon = Object.assign({}, row);
       this.editForm = true;
     },
     // 确定修改
     onEditCoupon(data) {
-      console.log(data);
       let oData = Object.assign({}, data);
       delete oData.code;
+      console.log(data);
+      console.log(oData);
       this.$http
         .put(`/coupon`, oData, {
           headers: {
@@ -272,8 +274,8 @@ export default {
           this.$message.error("网络错误，请稍后再试哦");
         });
     },
+    // 删除
     handleDelete(index, row) {
-      console.log(index, row);
       this.$confirm("此操作将永久删除该优惠券, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -323,7 +325,7 @@ export default {
     // 当前页改变时会触发
     handleCurrentChange(val) {
       this.currentPage = val;
-      console.log(`当前页: ${val}`);
+      this.getCouponInfo(val);
     }
   }
 };
