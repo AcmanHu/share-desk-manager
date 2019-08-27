@@ -153,7 +153,7 @@
         </div>
         <div class="inner_right">
           <div class="box_img">
-            <img src="../assets/logo.jpg" />
+            <!-- <img src="../assets/logo.jpg" /> -->
           </div>
         </div>
         <div class="clear"></div>
@@ -167,8 +167,8 @@ export default {
   name: "login",
   data() {
     return {
-      username: "",
-      password: "",
+      username: "admin",
+      password: "123456",
       isChooseIndex: 0,
       loginWays: ["密码登录", "验证码登录"],
       changeLoginWay: true
@@ -185,49 +185,37 @@ export default {
       this.changeLoginWay = true;
     },
     login() {
-      this.$router.push({ name: "home" });
-      // let that = this;
-      // if (!that.username) {
-      //   this.$message.error("请输入账户名！");
-      //   return;
-      // } else if (!that.password) {
-      //   this.$message.error("请输入密码！");
-      //   return;
-      // }
-      // this.$axios
-      //   .post(this.GVER.BasicPort + "/api/Authorize/Token", {
-      //     User: that.username,
-      //     Password: that.password,
-      //     Role: "System",
-      //     Type: 1
-      //   })
-      //   .then(function(data) {
-      //     if (data.StatusCode == 1) {
-      //       that.$message({
-      //         message: "登录成功",
-      //         type: "success"
-      //       });
-      //       sessionStorage.setItem("token", data.Value.Token);
-      //       sessionStorage.setItem("loginTime", new Date());
-      //       if (data.Value.OperationShop) {
-      //         sessionStorage.setItem(
-      //           "shopInfo",
-      //           JSON.stringify(data.Value.OperationShop)
-      //         );
-      //         that.$store.commit("setshopInfo", data.Value.OperationShop);
-      //       } else {
-      //         console.error("没有获取到店铺信息");
-      //         return false;
-      //       }
-      //       that.$router.replace({ name: "mainFrame" });
-      //     } else if (data.StatusCode == 0) {
-      //       that.$message.error(data.Value);
-      //       return;
-      //     }
-      //   })
-      //   .catch(function(error) {
-      //     console.log(error);
-      //   });
+      // this.$http({
+      //   method: "POST",
+      //   url: "/login",
+      //   data: { username: "123", code: "456" },
+      //   dataType: 'json',
+      // }).then(res => {
+      //   console.log(res);
+      // });
+
+      this.$http
+        .post("http://zelfly.com:81/login", {
+          username: this.username,
+          code: this.password
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            localStorage.setItem("token", res.data.data);
+            this.$message({
+              message: "登陆成功",
+              type: "success"
+            });
+            this.$router.replace({ name: "home" });
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(err => {
+          this.$message.error("网络错误，请稍后再试哦");
+          console.log(err);
+        });
     }
   }
 };

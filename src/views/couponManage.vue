@@ -87,24 +87,24 @@
 
 <script>
 export default {
-  name: 'StudentManage',
-  data () {
+  name: "StudentManage",
+  data() {
     return {
       // 表格数据
       tableData: [
         {
-          id: '001',
-          couponName: '优惠券',
-          tips: '这里是描述',
-          money: '100',
-          startDate: '2016-05-02',
-          endDate: '2018-08-20',
-          tag: '是',
-          shopName: '啦啦啦'
+          id: "001",
+          couponName: "优惠券",
+          tips: "这里是描述",
+          money: "100",
+          startDate: "2016-05-02",
+          endDate: "2018-08-20",
+          tag: "是",
+          shopName: "啦啦啦"
         }
       ],
       // 表格搜索数据
-      search: '',
+      search: "",
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
@@ -112,45 +112,89 @@ export default {
       // -----------------弹出层-----------------
       // 弹出层显示与隐藏
       dialogFormVisible: false,
-      formLabelWidth: '120px',
+      formLabelWidth: "120px",
       // 弹出层form表单的数据
       form: {
-        couponName: '',
-        tips: '',
-        money: '',
-        startDate: '',
-        endDate: '',
-        tag: '',
-        shopName: ''
+        couponName: "",
+        tips: "",
+        money: "",
+        startDate: "",
+        endDate: "",
+        tag: "",
+        shopName: ""
       }
-    }
+    };
   },
   computed: {
-    tableList () {
+    tableList() {
       return this.tableData.slice(
         (this.currentPage - 1) * this.pagesize,
         this.currentPage * this.pagesize
-      )
+      );
     }
   },
+  mounted() {
+    this.getCouponInfo();
+  },
   methods: {
-    handleEdit (index, row) {
-      console.log(index, row)
+    // 获取所有优惠券
+    getCouponInfo() {
+      this.$http
+        .get("/coupon/couponList", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          console.log(res);
+          // if (res.data.code === 0) {
+          //   if (res.data.data.list.length !== 0) {
+          //     this.pageTotal = res.data.data.list.length;
+          //     let arr = [];
+          //     for (const item of res.data.data.list) {
+          //       arr.push({
+          //         id: item.id,
+          //         name: item.userName,
+          //         bedroomNum: item.houseId,
+          //         date: item.pactTime.split("T")[0] || "",
+          //         applyDate: item.submitDate.split("T")[0] || "",
+          //         applyType: item.way === 1 ? "支付宝" : "优惠券",
+          //         status:
+          //           item.state == 2
+          //             ? "未审批"
+          //             : item.state == 3
+          //             ? "已通过"
+          //             : "未通过"
+          //       });
+          //     }
+          //     this.tableData = arr;
+          //   }
+          // } else {
+          //   this.$message.error("网络错误，请稍后再试哦");
+          // }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
-    handleDelete (index, row) {
-      console.log(index, row)
+    handleEdit(index, row) {
+      console.log(index, row);
+    },
+    handleDelete(index, row) {
+      console.log(index, row);
     },
     //  分页每页条目改变时会触发
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
     },
     // 当前页改变时会触发
-    handleCurrentChange (val) {
-      this.currentPage = val
-      console.log(`当前页: ${val}`)
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      console.log(`当前页: ${val}`);
     }
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
