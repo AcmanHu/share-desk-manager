@@ -164,27 +164,27 @@
 
 <script>
 export default {
-  name: "login",
-  data() {
+  name: 'login',
+  data () {
     return {
-      username: "admin",
-      password: "123456",
+      username: 'admin',
+      password: '123456',
       isChooseIndex: 0,
-      loginWays: ["密码登录", "验证码登录"],
+      loginWays: ['密码登录', '验证码登录'],
       changeLoginWay: true
-    };
+    }
   },
   methods: {
-    chooseWay(key) {
-      this.isChooseIndex = key;
+    chooseWay (key) {
+      this.isChooseIndex = key
     },
-    loginWayPassword() {
-      this.changeLoginWay = false;
+    loginWayPassword () {
+      this.changeLoginWay = false
     },
-    loginWayCode() {
-      this.changeLoginWay = true;
+    loginWayCode () {
+      this.changeLoginWay = true
     },
-    login() {
+    login () {
       // this.$http({
       //   method: "POST",
       //   url: "/login",
@@ -195,30 +195,30 @@ export default {
       // });
 
       this.$http
-        .post("http://zelfly.com:81/login", {
+        .post('http://zelfly.com:81/login', {
           username: this.username,
           code: this.password
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
-            localStorage.setItem("token", res.data.data);
+            localStorage.setItem('token', res.data.data)
             this.$message({
-              message: "登陆成功",
-              type: "success"
-            });
-            this.$router.replace({ name: "home" });
+              message: '登陆成功',
+              type: 'success'
+            })
+            this.$router.replace({ name: 'home' })
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(res.data.msg)
           }
         })
         .catch(err => {
-          this.$message.error("网络错误，请稍后再试哦");
-          console.log(err);
-        });
+          this.$message.error('网络错误，请稍后再试哦')
+          console.log(err)
+        })
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

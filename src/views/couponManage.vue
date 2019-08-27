@@ -139,8 +139,8 @@
 
 <script>
 export default {
-  name: "StudentManage",
-  data() {
+  name: 'StudentManage',
+  data () {
     return {
       // 表格数据
       tableData: [
@@ -158,7 +158,7 @@ export default {
         // }
       ],
       // 表格搜索数据
-      search: "",
+      search: '',
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
@@ -169,166 +169,166 @@ export default {
       // 弹出层显示与隐藏
       addCouponForm: false,
       editForm: false,
-      formLabelWidth: "120px",
+      formLabelWidth: '120px',
       // 弹出层form表单的数据
       form: {
-        couponName: "",
-        tips: "",
-        money: "",
-        startDate: "",
-        endDate: "",
-        tag: "",
-        shopName: ""
+        couponName: '',
+        tips: '',
+        money: '',
+        startDate: '',
+        endDate: '',
+        tag: '',
+        shopName: ''
       },
-      //编辑页面form表单数据
+      // 编辑页面form表单数据
       formCoupon: {
-        id: "",
-        name: "",
-        describe: "",
-        denomination: "",
-        condition: "",
-        count: "",
-        quantity: "",
-        startTime: "",
-        endTime: "",
-        merchant: "",
-        enable: ""
+        id: '',
+        name: '',
+        describe: '',
+        denomination: '',
+        condition: '',
+        count: '',
+        quantity: '',
+        startTime: '',
+        endTime: '',
+        merchant: '',
+        enable: ''
       }
-    };
-  },
-  computed: {
-    tableList() {
-      return this.tableData;
     }
   },
-  mounted() {
-    this.getCouponInfo();
+  computed: {
+    tableList () {
+      return this.tableData
+    }
+  },
+  mounted () {
+    this.getCouponInfo()
   },
   methods: {
     // 获取所有优惠券
-    getCouponInfo(num = 1) {
+    getCouponInfo (num = 1) {
       this.$http
-        .get("/coupon", {
+        .get('/coupon', {
           params: {
             pageNum: num
           },
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.total;
-              let arr = [];
+              this.pageTotal = res.data.data.total
+              let arr = []
               for (const item of res.data.data.list) {
                 item.startTime = item.startTime
-                  ? item.startTime.split("T")[0]
-                  : "";
-                item.endTime = item.endTime ? item.endTime.split("T")[0] : "";
-                arr.push(item);
+                  ? item.startTime.split('T')[0]
+                  : ''
+                item.endTime = item.endTime ? item.endTime.split('T')[0] : ''
+                arr.push(item)
               }
-              this.tableData = arr;
+              this.tableData = arr
             }
           } else {
-            this.$message.error("网络错误，请稍后再试哦");
+            this.$message.error('网络错误，请稍后再试哦')
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
     },
     // 修改
-    handleEdit(index, row) {
-      this.formCoupon = Object.assign({}, row);
-      this.editForm = true;
+    handleEdit (index, row) {
+      this.formCoupon = Object.assign({}, row)
+      this.editForm = true
     },
     // 确定修改
-    onEditCoupon(data) {
-      let oData = Object.assign({}, data);
-      delete oData.code;
-      console.log(data);
-      console.log(oData);
+    onEditCoupon (data) {
+      let oData = Object.assign({}, data)
+      delete oData.code
+      console.log(data)
+      console.log(oData)
       this.$http
         .put(`/coupon`, oData, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             this.$message({
-              message: "修改成功",
-              type: "success"
-            });
-            this.editForm = false;
+              message: '修改成功',
+              type: 'success'
+            })
+            this.editForm = false
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(res.data.msg)
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
     },
     // 删除
-    handleDelete(index, row) {
-      this.$confirm("此操作将永久删除该优惠券, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
+    handleDelete (index, row) {
+      this.$confirm('此操作将永久删除该优惠券, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
-          this.onDeleteCoupon(row.id);
+          this.onDeleteCoupon(row.id)
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     // 删除优惠券
-    onDeleteCoupon(id) {
+    onDeleteCoupon (id) {
       this.$http
         .delete(`/coupon`, {
           params: {
             id: id
           },
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             this.$message({
-              message: "删除成功",
-              type: "success"
-            });
+              message: '删除成功',
+              type: 'success'
+            })
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(res.data.msg)
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
     },
     //  分页每页条目改变时会触发
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
     },
     // 当前页改变时会触发
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getCouponInfo(val);
+    handleCurrentChange (val) {
+      this.currentPage = val
+      this.getCouponInfo(val)
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

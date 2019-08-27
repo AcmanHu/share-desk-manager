@@ -2,11 +2,11 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import { VueAxios, axios_instance } from './request'
+import { VueAxios, axiosInstance } from './request'
 import './plugins/element.js'
 import BreadCrumb from './components/BreadCrumb.vue'
 
-Vue.use(VueAxios, axios_instance)
+Vue.use(VueAxios, axiosInstance)
 Vue.component('breadCrumb', BreadCrumb)
 Vue.config.productionTip = false
 

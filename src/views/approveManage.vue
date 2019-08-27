@@ -99,183 +99,183 @@
 
 <script>
 export default {
-  name: "StudentManage",
-  data() {
+  name: 'StudentManage',
+  data () {
     return {
       // 表格数据
       tableData: [
         {
-          id: "001",
-          name: "刘小虎",
-          bedroomNum: "8532",
-          date: "2016-05-02",
-          applyDate: "2019-08-20",
-          applyType: "支付宝",
-          status: "未审批"
+          id: '001',
+          name: '刘小虎',
+          bedroomNum: '8532',
+          date: '2016-05-02',
+          applyDate: '2019-08-20',
+          applyType: '支付宝',
+          status: '未审批'
         }
       ],
       // 一条详情数据
       oneDetailData: {},
       tableFilterData: [
-        { text: "未审批", value: "未审批" },
-        { text: "已审批", value: "已审批" },
-        { text: "未通过", value: "未通过" }
+        { text: '未审批', value: '未审批' },
+        { text: '已审批', value: '已审批' },
+        { text: '未通过', value: '未通过' }
       ],
       // 表格搜索数据
-      search: "",
+      search: '',
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
       pagesize: 30,
       // 分页总数
       pageTotal: 10,
-      //弹出层
+      // 弹出层
       dialog: false,
       form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
         delivery: false,
         type: [],
-        resource: "",
-        desc: ""
+        resource: '',
+        desc: ''
       }
-    };
-  },
-  computed: {
-    tableList() {
-      return this.tableData;
     }
   },
-  mounted() {
-    this.getApproveInfo();
+  computed: {
+    tableList () {
+      return this.tableData
+    }
+  },
+  mounted () {
+    this.getApproveInfo()
   },
   methods: {
     // 获取审核数据
-    getApproveInfo(num = 1) {
+    getApproveInfo (num = 1) {
       this.$http
-        .get("/audit/getAll", {
+        .get('/audit/getAll', {
           params: {
             pageNum: num
           },
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.total;
-              let arr = [];
+              this.pageTotal = res.data.data.total
+              let arr = []
               for (const item of res.data.data.list) {
                 arr.push({
                   id: item.id,
                   name: item.userName,
                   bedroomNum: item.houseId,
-                  date: item.pactTime.split("T")[0] || "",
-                  applyDate: item.submitDate.split("T")[0] || "",
-                  applyType: item.way === 1 ? "支付宝" : "优惠券",
+                  date: item.pactTime.split('T')[0] || '',
+                  applyDate: item.submitDate.split('T')[0] || '',
+                  applyType: item.way === 1 ? '支付宝' : '优惠券',
                   status:
                     item.state == 2
-                      ? "未审批"
+                      ? '未审批'
                       : item.state == 3
-                      ? "已通过"
-                      : "未通过"
-                });
+                        ? '已通过'
+                        : '未通过'
+                })
               }
-              this.tableData = arr;
+              this.tableData = arr
             }
           } else {
-            this.$message.error("网络错误，请稍后再试哦");
+            this.$message.error('网络错误，请稍后再试哦')
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
     },
     // 表格详情
-    handleDetail(index, row) {
-      this.oneDetailData = row;
-      this.dialog = true;
+    handleDetail (index, row) {
+      this.oneDetailData = row
+      this.dialog = true
     },
     // 表格中状态的筛选
-    filterTag(value, row) {
-      return row.status === value;
+    filterTag (value, row) {
+      return row.status === value
     },
     //  分页每页条目改变时会触发
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
     },
     // 当前页改变时会触发
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getApproveInfo(val);
+    handleCurrentChange (val) {
+      this.currentPage = val
+      this.getApproveInfo(val)
     },
     // 关闭弹出层
-    handleClose(done) {
-      this.dialog = false;
+    handleClose (done) {
+      this.dialog = false
     },
     // 不同意审核
-    onDisagree() {
+    onDisagree () {
       let data = {
         id: this.oneDetailData.id,
-        state: "4",
-        cause: ""
-      };
-      this.$prompt("请输入理由", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
+        state: '4',
+        cause: ''
+      }
+      this.$prompt('请输入理由', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
       })
         .then(({ value }) => {
-          data.cause = value;
-          this.isPass(data);
+          data.cause = value
+          this.isPass(data)
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "取消输入"
-          });
-        });
+            type: 'info',
+            message: '取消输入'
+          })
+        })
     },
     // 是否通过审核
-    isPass(data) {
-      let oData = {};
-      if (data === "agree") {
-        oData.id = this.oneDetailData.id;
-        oData.state = "3";
+    isPass (data) {
+      let oData = {}
+      if (data === 'agree') {
+        oData.id = this.oneDetailData.id
+        oData.state = '3'
       } else {
-        oData = data;
+        oData = data
       }
-      console.log(oData);
+      console.log(oData)
       this.$http
-        .put("/audit", oData, {
+        .put('/audit', oData, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             this.$message({
-              message: "审核成功",
-              type: "success"
-            });
-            this.dialog = false;
-            this.getApproveInfo();
+              message: '审核成功',
+              type: 'success'
+            })
+            this.dialog = false
+            this.getApproveInfo()
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(res.data.msg)
           }
         })
         .catch(err => {
-          this.$message.error("网络错误，请稍后再试哦");
-          console.log(err);
-        });
+          this.$message.error('网络错误，请稍后再试哦')
+          console.log(err)
+        })
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

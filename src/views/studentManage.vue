@@ -77,8 +77,8 @@
 
 <script>
 export default {
-  name: "StudentManage",
-  data() {
+  name: 'StudentManage',
+  data () {
     return {
       // 表格数据
       tableData: [
@@ -94,7 +94,7 @@ export default {
         // }
       ],
       // 表格搜索数据
-      search: "",
+      search: '',
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
@@ -104,153 +104,153 @@ export default {
       // 新增表单
       dialogFormVisible: false,
       form: {
-        id: "",
-        userName: "",
-        houseId: "",
-        phone: "",
-        pactTime: ""
+        id: '',
+        userName: '',
+        houseId: '',
+        phone: '',
+        pactTime: ''
       },
-      formLabelWidth: "120px"
-    };
-  },
-  computed: {
-    tableList() {
-      return this.tableData;
+      formLabelWidth: '120px'
     }
   },
-  mounted() {
-    this.onGetUserInfo();
+  computed: {
+    tableList () {
+      return this.tableData
+    }
+  },
+  mounted () {
+    this.onGetUserInfo()
   },
   methods: {
     // 获取学生信息
-    onGetUserInfo(num = 1) {
+    onGetUserInfo (num = 1) {
       this.$http
-        .get("/user", {
+        .get('/user', {
           params: {
             pageNum: num
           },
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.total;
-              let arr = [];
+              this.pageTotal = res.data.data.total
+              let arr = []
               for (const item of res.data.data.list) {
                 item.pactTime = item.pactTime
-                  ? item.pactTime.split("T")[0]
-                  : "";
-                arr.push(item);
+                  ? item.pactTime.split('T')[0]
+                  : ''
+                arr.push(item)
               }
-              this.tableData = arr;
+              this.tableData = arr
             }
           } else {
-            this.$message.error("网络错误，请稍后再试哦");
+            this.$message.error('网络错误，请稍后再试哦')
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
     },
     // 编辑
-    handleEdit(index, row) {
-      console.log(index, row);
-      this.form = Object.assign({}, row);
-      this.dialogFormVisible = true;
+    handleEdit (index, row) {
+      console.log(index, row)
+      this.form = Object.assign({}, row)
+      this.dialogFormVisible = true
     },
-    onEditUser(data) {
-      let oData = Object.assign({}, data);
-      delete oData.landingTime;
-      console.log(data);
-      console.log(oData);
+    onEditUser (data) {
+      let oData = Object.assign({}, data)
+      delete oData.landingTime
+      console.log(data)
+      console.log(oData)
       this.$http
         .put(`/user`, oData, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             this.$message({
-              message: "修改成功",
-              type: "success"
-            });
-            this.onGetUserInfo();
-            this.editForm = false;
+              message: '修改成功',
+              type: 'success'
+            })
+            this.onGetUserInfo()
+            this.editForm = false
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(res.data.msg)
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
-      this.dialogFormVisible = false;
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
+      this.dialogFormVisible = false
     },
     // 删除
-    handleDelete(index, row) {
-      console.log(index, row);
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+    handleDelete (index, row) {
+      console.log(index, row)
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
         center: true
       })
         .then(() => {
           this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
+            type: 'success',
+            message: '删除成功!'
+          })
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     // 删除学生
-    onDeleteStu(id) {
+    onDeleteStu (id) {
       this.$http
         .delete(`/user/${id}`, {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
+            Authorization: 'Bearer ' + localStorage.getItem('token')
           }
         })
         .then(res => {
-          console.log(res);
+          console.log(res)
           if (res.data.code === 0) {
             this.$message({
-              message: "删除成功",
-              type: "success"
-            });
-            this.onGetUserInfo();
+              message: '删除成功',
+              type: 'success'
+            })
+            this.onGetUserInfo()
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(res.data.msg)
           }
         })
         .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+          console.log(error)
+          this.$message.error('网络错误，请稍后再试哦')
+        })
     },
     //  分页每页条目改变时会触发
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
     },
     // 当前页改变时会触发
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.onGetUserInfo(val);
-      console.log(`当前页: ${val}`);
+    handleCurrentChange (val) {
+      this.currentPage = val
+      this.onGetUserInfo(val)
+      console.log(`当前页: ${val}`)
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
