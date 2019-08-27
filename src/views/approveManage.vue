@@ -4,7 +4,7 @@
     <div class="m-wrap">
       <div class="search_box">
         <el-input v-model="search" size="small" placeholder="输入姓名或寝室号" class="search_input" />
-        <el-button type="primary" size="small" plain>添加</el-button>
+        <!-- <el-button type="primary" size="small" plain>添加</el-button> -->
       </div>
       <div class="table_box">
         <el-table
@@ -50,7 +50,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40]"
+        :page-sizes="[30, 60, 90, 120]"
         :page-size="pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pageTotal"
@@ -88,8 +88,8 @@
           </div>
         </div>
         <div class="demo-drawer__footer">
-          <el-button @click="dialog = false">同意</el-button>
-          <el-button type="primary" @click="onDisagree">不同意</el-button>
+          <el-button @click="isPass" type="primary" plain>同意</el-button>
+          <el-button type="danger" plain @click="onDisagree">不同意</el-button>
           <!-- <el-input placeholder="请输入内容"></el-input> -->
         </div>
       </div>
@@ -126,7 +126,7 @@ export default {
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
-      pagesize: 10,
+      pagesize: 30,
       // 分页总数
       pageTotal: 10,
       //
@@ -147,19 +147,19 @@ export default {
   },
   computed: {
     tableList() {
-      return this.tableData.slice(
-        (this.currentPage - 1) * this.pagesize,
-        this.currentPage * this.pagesize
-      );
+      return this.tableData;
     }
   },
   mounted() {
-    this.getApproveInfo();
+    this.getApproveInfo(1);
   },
   methods: {
-    getApproveInfo() {
+    getApproveInfo(num) {
       this.$http
         .get("/audit/getAll", {
+          params: {
+            pageNum: num
+          },
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -168,7 +168,7 @@ export default {
           console.log(res);
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.list.length;
+              this.pageTotal = res.data.data.total;
               let arr = [];
               for (const item of res.data.data.list) {
                 arr.push({
@@ -216,6 +216,7 @@ export default {
     // 当前页改变时会触发
     handleCurrentChange(val) {
       this.currentPage = val;
+      this.getApproveInfo(val);
       console.log(`当前页: ${val}`);
     },
     //
@@ -252,37 +253,38 @@ export default {
     },
     // 是否通过审核
     isPass(data) {
-      this.$http
-        .put(
-          "/audit/submit",
-          {
-            id: data.id,
-            state: data.state,
-            cause: data.cause
-          },
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token")
-            }
-          }
-        )
-        .then(res => {
-          console.log(res);
-          // if (res.data.code === 0) {
-          //   localStorage.setItem("token", res.data.data);
-          //   this.$message({
-          //     message: "登陆成功",
-          //     type: "success"
-          //   });
-          //   this.$router.replace({ name: "home" });
-          // } else {
-          //   this.$message.error(res.data.msg);
-          // }
-        })
-        .catch(err => {
-          this.$message.error("网络错误，请稍后再试哦");
-          console.log(err);
-        });
+      let oData = {};
+      if (data === "agree") {
+        oData.id = this.oneDetailData.id;
+        oData.state = "3";
+      } else {
+        oData = data;
+      }
+      console.log(oData);
+
+      // this.$http
+      //   .put("/audit/submit", oData, {
+      //     headers: {
+      //       Authorization: "Bearer " + localStorage.getItem("token")
+      //     }
+      //   })
+      //   .then(res => {
+      //     console.log(res);
+      //     // if (res.data.code === 0) {
+      //     //   localStorage.setItem("token", res.data.data);
+      //     //   this.$message({
+      //     //     message: "登陆成功",
+      //     //     type: "success"
+      //     //   });
+      //     //   this.$router.replace({ name: "home" });
+      //     // } else {
+      //     //   this.$message.error(res.data.msg);
+      //     // }
+      //   })
+      //   .catch(err => {
+      //     this.$message.error("网络错误，请稍后再试哦");
+      //     console.log(err);
+      //   });
     }
   }
 };
@@ -298,8 +300,13 @@ export default {
   position: relative;
 }
 .demo-drawer__wrap {
-  height: calc(100% - 40px);
+  padding: 0 20px;
+  box-sizing: border-box;
+  height: calc(100% - 60px);
   overflow: auto;
+  img {
+    margin-right: 10px;
+  }
 }
 .demo-drawer__footer {
   position: absolute;
@@ -307,9 +314,10 @@ export default {
   background: #fff;
   bottom: 0;
   height: 40px;
+  padding: 10px 0;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  box-shadow: 2px 2px 6px #ccc;
+  box-shadow: 2px 2px 6px #000;
 }
 </style>

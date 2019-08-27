@@ -13,12 +13,12 @@
           height="100%"
         >
           <el-table-column label="ID" prop="id" align="center" sortable></el-table-column>
-          <el-table-column label="商家名称" prop="shopName" align="center"></el-table-column>
-          <el-table-column label="地址" prop="address" align="center"></el-table-column>
+          <el-table-column label="商家名称" prop="name" align="center"></el-table-column>
+          <el-table-column label="地址" prop="site" align="center"></el-table-column>
           <el-table-column label="联系人" prop="contact" align="center"></el-table-column>
-          <el-table-column label="联系电话" prop="phone" align="center"></el-table-column>
-          <el-table-column label="创建日期" prop="createDate" align="center" sortable></el-table-column>
-          <el-table-column label="登录账户" prop="username" align="center"></el-table-column>
+          <el-table-column label="联系电话" prop="number" align="center"></el-table-column>
+          <el-table-column label="创建日期" prop="createTime" align="center" sortable></el-table-column>
+          <el-table-column label="登录账户" prop="account" align="center"></el-table-column>
           <el-table-column label="登录密码" prop="password" align="center"></el-table-column>
           <el-table-column align="center" label="操作">
             <template slot-scope="scope">
@@ -34,7 +34,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40]"
+        :page-sizes="[30, 60, 90, 120]"
         :page-size="pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pageTotal"
@@ -70,6 +70,33 @@
         <el-button type="primary" @click="onAddMerchant(form)">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 编辑优惠券 -->
+    <el-dialog title="编辑" :visible.sync="editForm" center width="500px">
+      <el-form :model="formCoupon">
+        <el-form-item label="商家名称" :label-width="formLabelWidth">
+          <el-input v-model="formCoupon.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="地址" :label-width="formLabelWidth">
+          <el-input v-model="formCoupon.site" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="联系人" :label-width="formLabelWidth">
+          <el-input v-model="formCoupon.contact" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="联系号码" :label-width="formLabelWidth">
+          <el-input v-model="formCoupon.number" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="账户" :label-width="formLabelWidth">
+          <el-input v-model="formCoupon.account" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth">
+          <el-input v-model="formCoupon.password" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editForm = false">取 消</el-button>
+        <el-button type="primary" @click="onEditBusiness(formCoupon)">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -80,27 +107,29 @@ export default {
     return {
       // 表格数据
       tableData: [
-        {
-          id: "001",
-          shopName: "商家名称",
-          address: "九龙坡",
-          contact: "联系人",
-          phone: "联系电话",
-          createDate: "2019-08-20",
-          username: "用户名",
-          password: "888888"
-        }
+        // {
+        //   id: "001",
+        //   shopName: "商家名称",
+        //   address: "九龙坡",
+        //   contact: "联系人",
+        //   phone: "联系电话",
+        //   createDate: "2019-08-20",
+        //   username: "用户名",
+        //   password: "888888"
+        // }
       ],
+      rowOne: {},
       // 表格搜索数据
       search: "",
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
-      pagesize: 10,
+      pagesize: 30,
       // 分页所有总数
       pageTotal: 10,
       // 弹出层显示与隐藏
       dialogFormVisible: false,
+      editForm: false,
       formLabelWidth: "120px",
       // 弹出层form表单的数据
       form: {
@@ -111,15 +140,13 @@ export default {
         phone: "",
         username: "",
         password: ""
-      }
+      },
+      formCoupon: {}
     };
   },
   computed: {
     tableList() {
-      return this.tableData.slice(
-        (this.currentPage - 1) * this.pagesize,
-        this.currentPage * this.pagesize
-      );
+      return this.tableData;
     }
   },
   mounted() {
@@ -127,9 +154,12 @@ export default {
   },
   methods: {
     // 获取商家信息
-    onGetInfo() {
+    onGetInfo(num = 1) {
       this.$http
         .get("/merchant", {
+          params: {
+            pageNum: num
+          },
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -142,18 +172,10 @@ export default {
               this.pageTotal = res.data.data.list.length;
               let arr = [];
               for (const item of res.data.data.list) {
-                arr.push({
-                  id: item.id,
-                  shopName: item.name,
-                  address: item.site,
-                  contact: item.contact,
-                  phone: item.number,
-                  createDate: item.createTime.split("T")[0]
-                    ? item.createTime.split("T")[0]
-                    : "",
-                  username: item.account,
-                  password: item.password
-                });
+                item.createTime = item.createTime
+                  ? item.createTime.split("T")[0]
+                  : "";
+                arr.push(item);
               }
               this.tableData = arr;
             }
@@ -166,16 +188,16 @@ export default {
           this.$message.error("网络错误，请稍后再试哦");
         });
     },
+    // 增加商家
     onAddMerchant(data) {
       console.log(data);
-
       let postData = {
         name: data.shopName,
         site: data.address,
         contact: data.contact,
         number: data.phone,
         account: data.username,
-        password: data.passowrd
+        password: data.password
       };
       this.$http
         .post("/merchant", postData, {
@@ -186,8 +208,14 @@ export default {
         .then(res => {
           console.log(res);
           if (res.data.code === 0) {
+            this.$message({
+              message: "添加成功",
+              type: "success"
+            });
+            this.onGetInfo();
+            this.dialogFormVisible = false;
           } else {
-            this.$message.error("网络错误，请稍后再试哦");
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
@@ -195,11 +223,91 @@ export default {
           this.$message.error("网络错误，请稍后再试哦");
         });
     },
+    // 编辑
     handleEdit(index, row) {
       console.log(index, row);
+      this.formCoupon = Object.assign({}, row);
+      this.editForm = true;
     },
+    onSureEdit(data) {
+      console.log(data);
+    },
+    // 确定修改
+    onEditBusiness(data) {
+      let oData = Object.assign({}, data);
+      delete oData.createTime;
+      console.log(oData);
+      console.log(data);
+
+      this.$http
+        .put(`/merchant`, oData, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "修改成功",
+              type: "success"
+            });
+            this.onGetInfo();
+            this.editForm = false;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+    },
+    // 删除
     handleDelete(index, row) {
       console.log(index, row);
+      this.$confirm("此操作将永久删除该商家, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.onDeleteBusiness(row.id);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+    // 删除商家
+    onDeleteBusiness(id) {
+      this.$http
+        .delete(`/merchant`, {
+          params: {
+            id: id
+          },
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            });
+            this.onGetInfo();
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     //  分页每页条目改变时会触发
     handleSizeChange(val) {
@@ -208,6 +316,7 @@ export default {
     // 当前页改变时会触发
     handleCurrentChange(val) {
       this.currentPage = val;
+      this.onGetInfo(val);
       console.log(`当前页: ${val}`);
     }
   }

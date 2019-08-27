@@ -44,6 +44,11 @@ export default new Router({
         component: () => import('./views/couponManage')
       },
       {
+        path: 'orderManage',
+        name: 'orderManage',
+        component: () => import('./views/orderManage')
+      },
+      {
         path: 'businessManage',
         name: 'businessManage',
         component: () => import('./views/businessManage')

@@ -4,7 +4,7 @@
     <div class="m-wrap">
       <div class="search_box">
         <el-input v-model="search" size="small" placeholder="输入姓名或寝室号" class="search_input" />
-        <el-button type="primary" size="small" plain>添加</el-button>
+        <!-- <el-button type="primary" size="small" plain>添加</el-button> -->
       </div>
       <div class="table_box">
         <el-table
@@ -170,6 +170,23 @@ export default {
           console.log(error);
           this.$message.error("网络错误，请稍后再试哦");
         });
+    },
+    onEditUser(data) {
+      console.log(data);
+      // this.$http
+      //   .put(`/user`, data, {
+      //     headers: {
+      //       Authorization: "Bearer " + localStorage.getItem("token")
+      //     }
+      //   })
+      //   .then(res => {
+      //     console.log(res);
+      //   })
+      //   .catch(error => {
+      //     console.log(error);
+      //     this.$message.error("网络错误，请稍后再试哦");
+      //   });
+      this.dialogFormVisible = false;
     },
     handleEdit(index, row) {
       console.log(index, row);
