@@ -4,7 +4,7 @@
     <div class="m-wrap">
       <div class="search_box">
         <el-input v-model="search" size="small" placeholder="输入姓名或寝室号" class="search_input" />
-        <!-- <el-button type="primary" size="small" plain>添加</el-button> -->
+        <el-button type="primary" size="small" plain @click="addFormVisible = true">添加</el-button>
       </div>
       <div class="table_box">
         <el-table
@@ -46,6 +46,33 @@
         :total="pageTotal"
       ></el-pagination>
     </div>
+    <!-- 增加用户 -->
+    <el-dialog title="编辑" :visible.sync="addFormVisible" center width="500px">
+      <el-form :model="addForm">
+        <el-form-item label="姓名" :label-width="formLabelWidth">
+          <el-input v-model="addForm.userName" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="寝室号" :label-width="formLabelWidth">
+          <el-input v-model="addForm.houseId" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" :label-width="formLabelWidth">
+          <el-input v-model="addForm.phone" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="合同时间" :label-width="formLabelWidth">
+          <el-date-picker
+            v-model="addForm.pactTime"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            style="width: 100%"
+          ></el-date-picker>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="onAddUser(addForm)">确 定</el-button>
+      </div>
+    </el-dialog>
     <!-- 编辑 -->
     <el-dialog title="编辑" :visible.sync="dialogFormVisible" center width="500px">
       <el-form :model="form">
@@ -63,6 +90,7 @@
             v-model="form.pactTime"
             type="date"
             placeholder="选择日期"
+            value-format="yyyy-MM-dd"
             style="width: 100%"
           ></el-date-picker>
         </el-form-item>
@@ -77,8 +105,8 @@
 
 <script>
 export default {
-  name: 'StudentManage',
-  data () {
+  name: "StudentManage",
+  data() {
     return {
       // 表格数据
       tableData: [
@@ -94,7 +122,7 @@ export default {
         // }
       ],
       // 表格搜索数据
-      search: '',
+      search: "",
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
@@ -103,154 +131,183 @@ export default {
       pageTotal: 10,
       // 新增表单
       dialogFormVisible: false,
+      addFormVisible: false,
       form: {
-        id: '',
-        userName: '',
-        houseId: '',
-        phone: '',
-        pactTime: ''
+        id: "",
+        userName: "",
+        houseId: "",
+        phone: "",
+        pactTime: ""
       },
-      formLabelWidth: '120px'
-    }
+      // 增加用户的表单
+      addForm: {
+        userName: "",
+        houseId: "",
+        phone: "",
+        pactTime: ""
+      },
+      formLabelWidth: "120px"
+    };
   },
   computed: {
-    tableList () {
-      return this.tableData
+    tableList() {
+      return this.tableData;
     }
   },
-  mounted () {
-    this.onGetUserInfo()
+  mounted() {
+    this.onGetUserInfo();
   },
   methods: {
     // 获取学生信息
-    onGetUserInfo (num = 1) {
+    onGetUserInfo(num = 1) {
       this.$http
-        .get('/user', {
+        .get("/user", {
           params: {
             pageNum: num
           },
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.total
-              let arr = []
+              this.pageTotal = res.data.data.total;
+              let arr = [];
               for (const item of res.data.data.list) {
-                item.pactTime = item.pactTime
-                  ? item.pactTime.split('T')[0]
-                  : ''
-                arr.push(item)
+                arr.push(item);
               }
-              this.tableData = arr
+              this.tableData = arr;
             }
           } else {
-            this.$message.error('网络错误，请稍后再试哦')
+            this.$message.error("网络错误，请稍后再试哦");
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+    },
+    // 增加用户
+    onAddUser(data) {
+      console.log(data);
+      this.$http
+        .post("/user", data, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
         })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "添加成功",
+              type: "success"
+            });
+            this.onGetUserInfo(this.currentPage);
+            this.addFormVisible = false;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     // 编辑
-    handleEdit (index, row) {
-      console.log(index, row)
-      this.form = Object.assign({}, row)
-      this.dialogFormVisible = true
+    handleEdit(index, row) {
+      console.log(index, row);
+      this.form = Object.assign({}, row);
+      this.dialogFormVisible = true;
     },
-    onEditUser (data) {
-      let oData = Object.assign({}, data)
-      delete oData.landingTime
-      console.log(data)
-      console.log(oData)
+    onEditUser(data) {
+      let oData = Object.assign({}, data);
+      delete oData.landingTime;
+      console.log(data);
+      console.log(oData);
       this.$http
         .put(`/user`, oData, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '修改成功',
-              type: 'success'
-            })
-            this.onGetUserInfo()
-            this.editForm = false
+              message: "修改成功",
+              type: "success"
+            });
+            this.onGetUserInfo(this.currentPage);
+            this.editForm = false;
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
-      this.dialogFormVisible = false
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+      this.dialogFormVisible = false;
     },
     // 删除
-    handleDelete (index, row) {
-      console.log(index, row)
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
+    handleDelete(index, row) {
+      console.log(index, row);
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
         center: true
       })
         .then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
+          this.onDeleteStu(row.id);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     // 删除学生
-    onDeleteStu (id) {
+    onDeleteStu(id) {
       this.$http
         .delete(`/user/${id}`, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-            this.onGetUserInfo()
+              message: "删除成功",
+              type: "success"
+            });
+            this.onGetUserInfo(this.currentPage);
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     //  分页每页条目改变时会触发
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
     },
     // 当前页改变时会触发
-    handleCurrentChange (val) {
-      this.currentPage = val
-      this.onGetUserInfo(val)
-      console.log(`当前页: ${val}`)
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.onGetUserInfo(val);
+      console.log(`当前页: ${val}`);
     }
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

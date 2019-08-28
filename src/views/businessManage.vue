@@ -56,7 +56,13 @@
           <el-input v-model="form.phone"></el-input>
         </el-form-item>
         <el-form-item label="日期" :label-width="formLabelWidth">
-          <el-date-picker v-model="form.date" type="date" placeholder="选择日期" style="width: 100%"></el-date-picker>
+          <el-date-picker
+            v-model="form.date"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            style="width: 100%"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label="登录账户" :label-width="formLabelWidth">
           <el-input v-model="form.username"></el-input>
@@ -102,8 +108,8 @@
 
 <script>
 export default {
-  name: 'StudentManage',
-  data () {
+  name: "StudentManage",
+  data() {
     return {
       // 表格数据
       tableData: [
@@ -120,7 +126,7 @@ export default {
       ],
       rowOne: {},
       // 表格搜索数据
-      search: '',
+      search: "",
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
@@ -130,66 +136,63 @@ export default {
       // 弹出层显示与隐藏
       addBusinessForm: false,
       editForm: false,
-      formLabelWidth: '120px',
+      formLabelWidth: "120px",
       // 弹出层form表单的数据
       form: {
-        shopName: '',
-        address: '',
-        contact: '',
-        date: '',
-        phone: '',
-        username: '',
-        password: ''
+        shopName: "",
+        address: "",
+        contact: "",
+        date: "",
+        phone: "",
+        username: "",
+        password: ""
       },
       formCoupon: {}
-    }
+    };
   },
   computed: {
-    tableList () {
-      return this.tableData
+    tableList() {
+      return this.tableData;
     }
   },
-  mounted () {
-    this.onGetInfo()
+  mounted() {
+    this.onGetInfo();
   },
   methods: {
     // 获取商家信息
-    onGetInfo (num = 1) {
+    onGetInfo(num = 1) {
       this.$http
-        .get('/merchant', {
+        .get("/merchant", {
           params: {
             pageNum: num
           },
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.list.length
-              let arr = []
+              this.pageTotal = res.data.data.list.length;
+              let arr = [];
               for (const item of res.data.data.list) {
-                item.createTime = item.createTime
-                  ? item.createTime.split('T')[0]
-                  : ''
-                arr.push(item)
+                arr.push(item);
               }
-              this.tableData = arr
+              this.tableData = arr;
             }
           } else {
-            this.$message.error('网络错误，请稍后再试哦')
+            this.$message.error("网络错误，请稍后再试哦");
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     // 增加商家
-    onAddMerchant (data) {
-      console.log(data)
+    onAddMerchant(data) {
+      console.log(data);
       let postData = {
         name: data.shopName,
         site: data.address,
@@ -197,122 +200,122 @@ export default {
         number: data.phone,
         account: data.username,
         password: data.password
-      }
+      };
       this.$http
-        .post('/merchant', postData, {
+        .post("/merchant", postData, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '添加成功',
-              type: 'success'
-            })
-            this.onGetInfo()
-            this.addBusinessForm = false
+              message: "添加成功",
+              type: "success"
+            });
+            this.onGetInfo();
+            this.addBusinessForm = false;
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     // 编辑
-    handleEdit (index, row) {
-      this.formCoupon = Object.assign({}, row)
-      this.editForm = true
+    handleEdit(index, row) {
+      this.formCoupon = Object.assign({}, row);
+      this.editForm = true;
     },
     // 确定修改
-    onEditBusiness (data) {
-      let oData = Object.assign({}, data)
-      delete oData.createTime
-      console.log(oData)
-      console.log(data)
+    onEditBusiness(data) {
+      let oData = Object.assign({}, data);
+      delete oData.createTime;
+      console.log(oData);
+      console.log(data);
       this.$http
         .put(`/merchant`, oData, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '修改成功',
-              type: 'success'
-            })
-            this.onGetInfo()
-            this.editForm = false
+              message: "修改成功",
+              type: "success"
+            });
+            this.onGetInfo();
+            this.editForm = false;
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     // 删除
-    handleDelete (index, row) {
-      this.$confirm('此操作将永久删除该商家, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    handleDelete(index, row) {
+      this.$confirm("此操作将永久删除该商家, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
         .then(() => {
-          this.onDeleteBusiness(row.id)
+          this.onDeleteBusiness(row.id);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     // 删除商家
-    onDeleteBusiness (id) {
+    onDeleteBusiness(id) {
       this.$http
         .delete(`/merchant`, {
           params: {
             id: id
           },
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
-            this.onGetInfo()
+              message: "删除成功",
+              type: "success"
+            });
+            this.onGetInfo();
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     //  分页每页条目改变时会触发
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
     },
     // 当前页改变时会触发
-    handleCurrentChange (val) {
-      this.currentPage = val
-      this.onGetInfo(val)
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.onGetInfo(val);
     }
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

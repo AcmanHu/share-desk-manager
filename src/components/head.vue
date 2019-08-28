@@ -3,11 +3,11 @@
     <div class="wrap">
       <span class="title">共享书桌后台管理系统</span>
       <div class="avater">
-        <el-dropdown>
+        <el-dropdown @command="exit">
           <el-avatar :size="50" :src="circleUrl"></el-avatar>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>重新登录</el-dropdown-item>
-            <el-dropdown-item>退出</el-dropdown-item>
+            <el-dropdown-item command="重新登陆">重新登录</el-dropdown-item>
+            <el-dropdown-item command="退出">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -17,17 +17,23 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       circleUrl:
-        'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-    }
+        "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+    };
   },
   computed: {},
-  created () {},
+  created() {},
+  methods: {
+    exit(e) {
+      // console.log(e);
 
-  methods: {}
-}
+      localStorage.removeItem("token");
+      this.$router.replace({ name: "login" });
+    }
+  }
+};
 </script>
 
 <style scoped lang="scss">

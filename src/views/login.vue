@@ -195,7 +195,7 @@ export default {
       // });
 
       this.$http
-        .post('http://zelfly.com:81/login', {
+        .post('/login', {
           username: this.username,
           code: this.password
         })

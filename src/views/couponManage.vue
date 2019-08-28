@@ -4,7 +4,7 @@
     <div class="m-wrap">
       <div class="search_box">
         <el-input v-model="search" size="small" placeholder="输入姓名或寝室号" class="search_input" />
-        <!-- <el-button type="primary" size="small" plain @click="addCouponForm = true">添加</el-button> -->
+        <el-button type="primary" size="small" plain @click="addCoupon">添加</el-button>
       </div>
       <div class="table_box">
         <el-table
@@ -18,17 +18,17 @@
           <el-table-column label="面额" prop="denomination" align="center"></el-table-column>
           <el-table-column label="开始日期" prop="startTime" align="center" sortable></el-table-column>
           <el-table-column label="结束日期" prop="endTime" align="center" sortable></el-table-column>
-          <!-- <el-table-column label="标签" prop="tag" align="center">
-            <template slot-scope="scope">
-              <el-tag
-                :type="scope.row.tag === '是' ? 'primary' : 'danger'"
-                disable-transitions
-              >{{scope.row.tag}}</el-tag>
-            </template>
-          </el-table-column>-->
-          <el-table-column label="所属商家" prop="merchant" align="center"></el-table-column>
+          <el-table-column label="所属商家" prop="merchantId" align="center"></el-table-column>
           <el-table-column label="总量" prop="quantity" align="center"></el-table-column>
           <el-table-column label="剩余数量" prop="count" align="center"></el-table-column>
+          <el-table-column label="标签" prop="enable" align="center">
+            <template slot-scope="scope">
+              <el-tag
+                :type="scope.row.enable === '1' ? 'primary' : 'danger'"
+                disable-transitions
+              >{{scope.row.enable === '1' ? '启用' : '禁用'}}</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column align="center" label="操作">
             <template slot-scope="scope">
               <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -56,39 +56,63 @@
         :total="pageTotal"
       ></el-pagination>
     </div>
-    <!-- 弹出层位置 -->
+    <!-- 新增优惠券 -->
     <el-dialog title="新增优惠券" :visible.sync="addCouponForm" center width="500px">
       <el-form :model="form">
         <el-form-item label="优惠券名称" :label-width="formLabelWidth">
-          <el-input v-model="form.couponName"></el-input>
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth">
-          <el-input v-model="form.tips"></el-input>
+          <el-input v-model="form.name"></el-input>
         </el-form-item>
         <el-form-item label="面额" :label-width="formLabelWidth">
-          <el-input v-model="form.money"></el-input>
+          <el-input v-model="form.denomination"></el-input>
+        </el-form-item>
+        <el-form-item label="数量" :label-width="formLabelWidth">
+          <el-input v-model="form.quantity"></el-input>
+        </el-form-item>
+        <el-form-item label="描述" :label-width="formLabelWidth">
+          <el-input v-model="form.describe"></el-input>
+        </el-form-item>
+        <el-form-item label="满减条件" :label-width="formLabelWidth">
+          <el-input v-model="form.condition" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="商家" :label-width="formLabelWidth">
+          <el-select v-model="form.merchantId" placeholder="选择商家" style="width: 100%;">
+            <el-option
+              :label="item.name"
+              :value="item.id"
+              v-for="(item, key) in selectList"
+              :key="key"
+            ></el-option>
+            <!-- <el-option label="区域二" value="beijing"></el-option> -->
+          </el-select>
         </el-form-item>
         <el-form-item label="开始日期" :label-width="formLabelWidth">
           <el-date-picker
-            v-model="form.startDate"
+            v-model="form.startTime"
             type="date"
             placeholder="选择日期"
+            value-format="yyyy-MM-dd"
             style="width: 100%"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="结束日期" :label-width="formLabelWidth">
-          <el-date-picker v-model="form.endDate" type="date" placeholder="选择日期" style="width: 100%"></el-date-picker>
+          <el-date-picker
+            v-model="form.endTime"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            style="width: 100%"
+          ></el-date-picker>
         </el-form-item>
-        <el-form-item label="标签" :label-width="formLabelWidth">
+        <!-- <el-form-item label="标签" :label-width="formLabelWidth">
           <el-input v-model="form.tag"></el-input>
-        </el-form-item>
-        <el-form-item label="所属商家" :label-width="formLabelWidth">
-          <el-input v-model="form.shopName"></el-input>
+        </el-form-item>-->
+        <el-form-item label="是否启用" :label-width="formLabelWidth">
+          <el-switch v-model="form.enable" active-value="1" inactive-value="0"></el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addCouponForm = false">取 消</el-button>
-        <el-button type="primary" @click="addCouponForm = false">确 定</el-button>
+        <el-button type="primary" @click="onAddCoupon(form)">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 编辑优惠券 -->
@@ -110,21 +134,21 @@
           <el-date-picker
             v-model="formCoupon.startTime"
             type="date"
-            placeholder="选择日期"
-            style="width: 100%"
+            placeholder="选择日期时间"
+            value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="结束日期" :label-width="formLabelWidth">
           <el-date-picker
             v-model="formCoupon.endTime"
             type="date"
-            placeholder="选择日期"
-            style="width: 100%"
+            placeholder="选择日期时间"
+            value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="商家" :label-width="formLabelWidth">
+        <!-- <el-form-item label="商家" :label-width="formLabelWidth">
           <el-input v-model="formCoupon.merchant" autocomplete="off"></el-input>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="是否启用" :label-width="formLabelWidth">
           <el-switch v-model="formCoupon.enable" active-value="1" inactive-value="0"></el-switch>
         </el-form-item>
@@ -139,8 +163,8 @@
 
 <script>
 export default {
-  name: 'StudentManage',
-  data () {
+  name: "StudentManage",
+  data() {
     return {
       // 表格数据
       tableData: [
@@ -158,7 +182,7 @@ export default {
         // }
       ],
       // 表格搜索数据
-      search: '',
+      search: "",
       // 分页当前页数
       currentPage: 1,
       // 每页显示条目个数
@@ -169,166 +193,234 @@ export default {
       // 弹出层显示与隐藏
       addCouponForm: false,
       editForm: false,
-      formLabelWidth: '120px',
+      formLabelWidth: "120px",
       // 弹出层form表单的数据
       form: {
-        couponName: '',
-        tips: '',
-        money: '',
-        startDate: '',
-        endDate: '',
-        tag: '',
-        shopName: ''
+        name: "",
+        describe: "",
+        denomination: "",
+        quantity: "",
+        condition: "",
+        count: "",
+        quantity: "",
+        startTime: "",
+        endTime: "",
+        merchantId: "",
+        enable: ""
       },
+      // 所有商家list
+      selectList: [],
       // 编辑页面form表单数据
       formCoupon: {
-        id: '',
-        name: '',
-        describe: '',
-        denomination: '',
-        condition: '',
-        count: '',
-        quantity: '',
-        startTime: '',
-        endTime: '',
-        merchant: '',
-        enable: ''
+        id: "",
+        name: "",
+        describe: "",
+        denomination: "",
+        condition: "",
+        count: "",
+        quantity: "",
+        startTime: "",
+        endTime: "",
+        merchant: "",
+        enable: ""
       }
-    }
+    };
   },
   computed: {
-    tableList () {
-      return this.tableData
+    tableList() {
+      return this.tableData;
     }
   },
-  mounted () {
-    this.getCouponInfo()
+  mounted() {
+    this.getCouponInfo();
   },
   methods: {
     // 获取所有优惠券
-    getCouponInfo (num = 1) {
+    getCouponInfo(num = 1) {
       this.$http
-        .get('/coupon', {
+        .get("/coupon/all", {
           params: {
             pageNum: num
           },
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             if (res.data.data.list.length !== 0) {
-              this.pageTotal = res.data.data.total
-              let arr = []
+              this.pageTotal = res.data.data.total;
+              let arr = [];
               for (const item of res.data.data.list) {
-                item.startTime = item.startTime
-                  ? item.startTime.split('T')[0]
-                  : ''
-                item.endTime = item.endTime ? item.endTime.split('T')[0] : ''
-                arr.push(item)
+                arr.push(item);
               }
-              this.tableData = arr
+              this.tableData = arr;
             }
           } else {
-            this.$message.error('网络错误，请稍后再试哦')
+            this.$message.error("网络错误，请稍后再试哦");
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+    },
+    // 增加优惠券
+    onAddCoupon(data) {
+      console.log(data);
+      data.count = data.quantity;
+      this.$http
+        .post("/coupon", data, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
         })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$message({
+              message: "添加成功",
+              type: "success"
+            });
+            this.getCouponInfo();
+            this.addCouponForm = false;
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+    },
+    // 获取商家信息
+    onGetInfo(num = 1) {
+      this.$http
+        .get("/merchant", {
+          params: {
+            pageNum: num
+          },
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          console.log(res);
+          if (res.data.code === 0) {
+            if (res.data.data.list.length !== 0) {
+              this.pageTotal = res.data.data.list.length;
+              let arr = [];
+              for (const item of res.data.data.list) {
+                arr.push({ id: item.id, name: item.name });
+              }
+              this.selectList = arr;
+            }
+          } else {
+            this.$message.error("网络错误，请稍后再试哦");
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
+    },
+    // 新增优惠卷事件
+    addCoupon() {
+      this.onGetInfo();
+      this.addCouponForm = true;
     },
     // 修改
-    handleEdit (index, row) {
-      this.formCoupon = Object.assign({}, row)
-      this.editForm = true
+    handleEdit(index, row) {
+      this.formCoupon = Object.assign({}, row);
+      this.editForm = true;
     },
     // 确定修改
-    onEditCoupon (data) {
-      let oData = Object.assign({}, data)
-      delete oData.code
-      console.log(data)
-      console.log(oData)
+    onEditCoupon(data) {
+      let oData = Object.assign({}, data);
+      delete oData.code;
+      console.log(data);
+      console.log(oData);
       this.$http
         .put(`/coupon`, oData, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '修改成功',
-              type: 'success'
-            })
-            this.editForm = false
+              message: "修改成功",
+              type: "success"
+            });
+            this.getCouponInfo();
+            this.editForm = false;
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     // 删除
-    handleDelete (index, row) {
-      this.$confirm('此操作将永久删除该优惠券, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+    handleDelete(index, row) {
+      this.$confirm("此操作将永久删除该优惠券, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       })
         .then(() => {
-          this.onDeleteCoupon(row.id)
+          this.onDeleteCoupon(row.id);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     // 删除优惠券
-    onDeleteCoupon (id) {
+    onDeleteCoupon(id) {
       this.$http
         .delete(`/coupon`, {
           params: {
             id: id
           },
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('token')
+            Authorization: "Bearer " + localStorage.getItem("token")
           }
         })
         .then(res => {
-          console.log(res)
+          console.log(res);
           if (res.data.code === 0) {
             this.$message({
-              message: '删除成功',
-              type: 'success'
-            })
+              message: "删除成功",
+              type: "success"
+            });
+            this.getCouponInfo();
           } else {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.data.msg);
           }
         })
         .catch(error => {
-          console.log(error)
-          this.$message.error('网络错误，请稍后再试哦')
-        })
+          console.log(error);
+          this.$message.error("网络错误，请稍后再试哦");
+        });
     },
     //  分页每页条目改变时会触发
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
     },
     // 当前页改变时会触发
-    handleCurrentChange (val) {
-      this.currentPage = val
-      this.getCouponInfo(val)
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.getCouponInfo(val);
     }
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

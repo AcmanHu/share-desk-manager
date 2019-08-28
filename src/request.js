@@ -4,9 +4,10 @@ import Qs from 'qs'
 import { MessageBox } from 'element-ui'
 import router from './router'
 
-axios.defaults.baseURL = 'http://zelfly.com:81'
+// axios.defaults.baseURL = 'http://zelfly.com:81'
 let axiosInstance = axios.create({
   // config里面有这个transformRquest， 这个选项会在发送参数前进行处理。 这时候我们通过Qs.stringify转换为表单查询参数
+  baseURL: 'http://zelfly.com:81',
   transformRequest: [function (data) {
     data = Qs.stringify(data)
     return data
@@ -31,7 +32,7 @@ axiosInstance.interceptors.request.use(function (config) {
 // 添加响应拦截器
 axiosInstance.interceptors.response.use((response) => {
   // 对响应数据做点什么
-  console.log(response)
+  // console.log(response)
 
   return response
 }, (error) => {
