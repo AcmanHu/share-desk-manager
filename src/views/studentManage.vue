@@ -55,7 +55,7 @@
         <el-form-item label="寝室号" :label-width="formLabelWidth">
           <el-input v-model="addForm.houseId" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="手机号" :label-width="formLabelWidth">
+        <el-form-item label="手机号" :label-width="formLabelWidth" prop="phone">
           <el-input v-model="addForm.phone" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="合同时间" :label-width="formLabelWidth">
@@ -146,7 +146,12 @@ export default {
         phone: "",
         pactTime: ""
       },
-      formLabelWidth: "120px"
+      formLabelWidth: "120px",
+      // 表单验证
+      addRules: {
+        name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        houseId: [{ required: true, message: "请寝室号", trigger: "change" }]
+      }
     };
   },
   computed: {
@@ -192,6 +197,14 @@ export default {
     // 增加用户
     onAddUser(data) {
       console.log(data);
+      // this.$refs[data].validate(valid => {
+      //   if (valid) {
+      //     alert("submit!");
+      //   } else {
+      //     console.log("error submit!!");
+      //     return false;
+      //   }
+      // });
       this.$http
         .post("/user", data, {
           headers: {
