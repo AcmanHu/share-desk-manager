@@ -48,17 +48,17 @@
     </div>
     <!-- 增加用户 -->
     <el-dialog title="编辑" :visible.sync="addFormVisible" center width="500px">
-      <el-form :model="addForm">
-        <el-form-item label="姓名" :label-width="formLabelWidth">
+      <el-form :model="addForm" :rules="addRules" ref="addForm">
+        <el-form-item label="姓名" :label-width="formLabelWidth" prop="userName">
           <el-input v-model="addForm.userName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="寝室号" :label-width="formLabelWidth">
-          <el-input v-model="addForm.houseId" autocomplete="off"></el-input>
+        <el-form-item label="寝室号" :label-width="formLabelWidth" prop="houseId">
+          <el-input v-model.number="addForm.houseId" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="手机号" :label-width="formLabelWidth" prop="phone">
           <el-input v-model="addForm.phone" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="合同时间" :label-width="formLabelWidth">
+        <el-form-item label="合同时间" :label-width="formLabelWidth" prop="pactTime">
           <el-date-picker
             v-model="addForm.pactTime"
             type="date"
@@ -90,7 +90,6 @@
             v-model="form.pactTime"
             type="date"
             placeholder="选择日期"
-            value-format="yyyy-MM-dd"
             style="width: 100%"
           ></el-date-picker>
         </el-form-item>
@@ -107,6 +106,18 @@
 export default {
   name: "StudentManage",
   data() {
+    var checkPhone = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("手机号不能为空"));
+      } else {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
+        if (reg.test(value)) {
+          callback();
+        } else {
+          return callback(new Error("请输入正确的手机号"));
+        }
+      }
+    };
     return {
       // 表格数据
       tableData: [
@@ -149,8 +160,20 @@ export default {
       formLabelWidth: "120px",
       // 表单验证
       addRules: {
-        name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
-        houseId: [{ required: true, message: "请寝室号", trigger: "change" }]
+        userName: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        houseId: [
+          { required: true, message: "请输入寝室号", trigger: "blur" },
+          { type: "number", message: "寝室号必须为数字" }
+        ],
+        phone: [{ required: true, validator: checkPhone, trigger: "blur" }],
+        pactTime: [
+          {
+            // type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "change"
+          }
+        ]
       }
     };
   },
@@ -197,37 +220,35 @@ export default {
     // 增加用户
     onAddUser(data) {
       console.log(data);
-      // this.$refs[data].validate(valid => {
-      //   if (valid) {
-      //     alert("submit!");
-      //   } else {
-      //     console.log("error submit!!");
-      //     return false;
-      //   }
-      // });
-      this.$http
-        .post("/user", data, {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token")
-          }
-        })
-        .then(res => {
-          console.log(res);
-          if (res.data.code === 0) {
-            this.$message({
-              message: "添加成功",
-              type: "success"
+      this.$refs["addForm"].validate(valid => {
+        if (valid) {
+          this.$http
+            .post("/user", data, {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token")
+              }
+            })
+            .then(res => {
+              console.log(res);
+              if (res.data.code === 0) {
+                this.$message({
+                  message: "添加成功",
+                  type: "success"
+                });
+                this.onGetUserInfo(this.currentPage);
+                this.addFormVisible = false;
+              } else {
+                this.$message.error(res.data.msg);
+              }
+            })
+            .catch(error => {
+              console.log(error);
+              this.$message.error("网络错误，请稍后再试哦");
             });
-            this.onGetUserInfo(this.currentPage);
-            this.addFormVisible = false;
-          } else {
-            this.$message.error(res.data.msg);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          this.$message.error("网络错误，请稍后再试哦");
-        });
+        } else {
+          return false;
+        }
+      });
     },
     // 编辑
     handleEdit(index, row) {

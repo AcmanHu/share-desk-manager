@@ -21,12 +21,12 @@
           <el-table-column label="所属商家" prop="merchantId" align="center"></el-table-column>
           <el-table-column label="总量" prop="quantity" align="center"></el-table-column>
           <el-table-column label="剩余数量" prop="count" align="center"></el-table-column>
-          <el-table-column label="标签" prop="enable" align="center">
+          <el-table-column label="状态" prop="enable" align="center">
             <template slot-scope="scope">
               <el-tag
                 :type="scope.row.enable === '1' ? 'primary' : 'danger'"
                 disable-transitions
-              >{{scope.row.enable === '1' ? '启用' : '禁用'}}</el-tag>
+              >{{scope.row.enable === '1' ? '已启用' : '已禁用'}}</el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center" label="操作">

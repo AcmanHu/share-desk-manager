@@ -3,7 +3,7 @@
     <el-container class="ele_container pb_height">
       <el-aside width="200px" class="ele_aside pb_height">
         <div class="logo_box">
-          <img src="../assets/logo.jpg" alt />
+          <!-- <img src="../assets/logo.jpg" alt /> -->
         </div>
         <el-menu
           :default-active="navActive"
